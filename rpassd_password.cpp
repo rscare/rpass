@@ -64,6 +64,25 @@ void d_addRpassAccount(const vector<string> &opts, vector<char> &retval) {
     retval = vector<char>(noerr.begin(), noerr.end());
 }
 
+void d_deleteRpassAccount(const vector<string> &opts, vector<char> &retval) {
+    string err = "ERR";
+    string noerr = "NOERR";
+
+    vector<string>::const_iterator i = opts.begin();
+
+    string filename = *(i++);
+    string acname = "";
+
+    for (; i < opts.end(); ++i) {
+        acname.append(*i); acname.append(" ");
+    }
+    acname.erase(acname.length() - 1);
+
+    deleteRpassParent(acname.c_str(), filename.c_str());
+
+    retval = vector<char>(noerr.begin(), noerr.end());
+}
+
 string rparentsToString(const rpass_parent * const parent, const vector<string> &field) {
     const rpass_parent * cur = parent;
     const rpass_entry * rentry = NULL;

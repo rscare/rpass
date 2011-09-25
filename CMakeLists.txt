@@ -10,4 +10,8 @@ find_package(Librpass)
 include_directories(${LIBRPASS_INCLUDE_DIR})
 target_link_libraries(rpassd ${LIBRPASS_LIBRARIES})
 
+if (NOT CMAKE_BUILD_TYPE)
+  set (CMAKE_BUILD_TYPE Debug)
+endif (NOT CMAKE_BUILD_TYPE)
+
 install(TARGETS rpassd DESTINATION bin)

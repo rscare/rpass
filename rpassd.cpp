@@ -131,6 +131,7 @@ void setupOperators(map<string, OPERATOR_FUNCTION> &o) {
 #ifdef RPASS_SUPPORT
     o[RPASS_DAEMON_MSG_GETACCOUNTS] = d_getRpassAccounts;
     o[RPASS_DAEMON_MSG_ADDACCOUNT] = d_addRpassAccount;
+    o[RPASS_DAEMON_MSG_DELETEACCOUNT] = d_deleteRpassAccount;
 #endif
 }
 
