@@ -8,4 +8,7 @@ void d_encryptDataToFile(const std::vector<std::string> &args, std::vector<char>
 void d_decryptFileToData(const std::vector<std::string> &filename, std::vector<char> &retval);
 void d_encryptFile(const std::vector<std::string> &filenames, std::vector<char> &retval);
 
+void d_forgetCipher(const std::vector<std::string> &opts, std::vector<char> &retval);
+void d_changePassphrase(const std::vector<std::string> &filename, std::vector<char> &retval);
+
 #endif

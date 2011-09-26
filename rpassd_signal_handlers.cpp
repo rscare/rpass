@@ -47,3 +47,15 @@ void d_encryptFile(const vector<string> &filenames, vector<char> &retval) {
     }
     retval = vector<char>(err.begin(), err.end());
 }
+
+void d_forgetCipher(const vector<string> &opts, vector<char> &retval) {
+    string noerr = "NOERR";
+    forgetCipher();
+    retval = vector<char>(noerr.begin(), noerr.end());
+}
+
+void d_changePassphrase(const vector<string> &filename, vector<char> &retval) {
+    string noerr = "NOERR";
+    changePassphrase(filename[0].c_str());
+    retval = vector<char>(noerr.begin(), noerr.end());
+}

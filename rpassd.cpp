@@ -22,9 +22,11 @@ extern "C" {
 #include <cstring>
 #include <cstdlib>
 #include <cctype>
+#include <ctime>
 #include <gcrypt.h>
 
 #define ALLOWED_CONNECTIONS 3
+#define DEFAULT_FORGETTIME (60 * 70)
 
 typedef void (*OPERATOR_FUNCTION)(const std::vector<std::string> &args, std::vector<char> &retval);
 
@@ -32,7 +34,7 @@ using namespace std;
 
 void daemonize();
 void close_std_fds();
-void setupSocket();
+void setupSocket(int fgtime);
 
 vector<string> splitArgs(const string &args);
 
@@ -75,7 +77,7 @@ vector<string> splitArgs(const string &args) {
     return parsed_args;
 }
 
-void setupSocket() {
+void setupSocket(int fgtime) {
     unsigned int s1 = socket(AF_UNIX, SOCK_STREAM, 0), s2;
     sockaddr_un local;
     char buffer[BUFSIZ];
@@ -83,6 +85,8 @@ void setupSocket() {
     vector<char> retval;
     vector<string> args;
     ssize_t read_size;
+
+    time_t init;
 
     map<string, OPERATOR_FUNCTION>::iterator found;
     map<string, OPERATOR_FUNCTION> instructions_operator;
@@ -96,7 +100,13 @@ void setupSocket() {
     bind(s1, (struct sockaddr *)&local, strlen(local.sun_path) + sizeof(local.sun_family));
     listen(s1, ALLOWED_CONNECTIONS);
 
+    init = time(NULL);
+
     while (1) {
+        if ((init - time(NULL)) >= fgtime) {
+            forgetCipher();
+            init = time(NULL);
+        }
         s2 = accept(s1, NULL, NULL);
         while ((read_size = recv(s2, buffer, BUFSIZ, 0)) > 0) {
             instructions.append(buffer, read_size);
@@ -128,6 +138,8 @@ void setupOperators(map<string, OPERATOR_FUNCTION> &o) {
     o[RPASS_DAEMON_MSG_DECRYPTFILE] = d_decryptFileToData;
     o[RPASS_DAEMON_MSG_ENCRYPTFILE] = d_encryptFile;
     o[RPASS_DAEMON_MSG_ENCRYPTDATATOFILE] = d_encryptDataToFile;
+    o[RPASS_DAEMON_MSG_FORGETCIPHER] = d_forgetCipher;
+    o[RPASS_DAEMON_MSG_CHANGEPASSPHRASE] = d_changePassphrase;
 #ifdef RPASS_SUPPORT
     o[RPASS_DAEMON_MSG_GETACCOUNTS] = d_getRpassAccounts;
     o[RPASS_DAEMON_MSG_ADDACCOUNT] = d_addRpassAccount;
@@ -137,6 +149,7 @@ void setupOperators(map<string, OPERATOR_FUNCTION> &o) {
 
 int main(int argc, char *argv[]) {
     bool foreground = false, verbose = false;
+    int forgettime = DEFAULT_FORGETTIME;
 
     if (argc > 1) {
         for (int c = 1; c < argc; ++c) {
@@ -150,6 +163,10 @@ int main(int argc, char *argv[]) {
             if ((string("--verbose") == argv[c]) || (string("-v") == argv[c])) {
                 verbose = true;
             }
+            if (((string("--forgettime") == argv[c]) || (string("-f") == argv[c]))
+                && (c < argc - 1)) {
+                forgettime = atoi(argv[++c]);
+            }
         }
     }
 
@@ -162,7 +179,7 @@ int main(int argc, char *argv[]) {
     if (verbose)
         cout << "Setting up socket..." << endl;
 
-    setupSocket();
+    setupSocket(forgettime);
 
     return 0;
 }
