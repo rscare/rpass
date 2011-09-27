@@ -1,0 +1,292 @@
+rpass(1)
+========
+Yuri D. Lenskiy <yuri.lenskiy@gmail.com>
+
+NAME
+----
+
+rpass - secure (i.e. encrypted), simple, command-line password manager
+
+SYNOPSIS
+--------
+
+*rpass* -a ['NEW ACCOUNT NAMES' ...]
+
+*rpass* -d 'ACCOUNT NAMES'
+
+*rpass* ['OPTIONS'] 'PATTERNS' ...
+
+*rp*
+
+*ru*
+
+DESCRIPTION
+-----------
+
+*rpass* is a module and related executable that are meant to make secure
+password management through the commandline and almost all programs that use
+passwords accessible, convenient, and easy.
+
+DEPENDENCIES
+------------
+
+* The executable *gpg* must be in your $PATH. This is the ONLY required dependency.
+* In order for copying to the X-clipboard to work, *xclip* must be in the
+  user's $PATH.
+* *gpg-agent* for tool to be used to full potential.
+* *dmenu* for gui tools (*rp* and *ru*)
+
+SETUP
+-----
+
+If installing from source:
+
+----
+# python setup.py install
+----
+
+Run rpass once to set up *gpg* (generate keys) if this has not been done already.
+
+USAGE
+-----
+
+NOTE: See `rpass -h` for a complete summary of command-line options.
+
+WARNING: It is highly recommended to have *xclip* installed so that
+passwords never have to be written to stdout.
+
+NOTE: Passwords and usernames are never printed unless stated explicitly (see `rpass -h`)
+
+CONFIGURATION
+~~~~~~~~~~~~~
+
+Upon installation a heavily commented configuration file is placed in the home
+directory at ~/.rpass.conf. If you delete or change this configuration file
+and want to see the comments/documentation again, there is one located in
+$PREFIX/share/rpass/rpass.example.conf.
+
+In this configuration file you can set up most of the relevant defaults to *rpass*.
+
+VIEWING
+~~~~~~~
+
+NOTE: These are the defaults, you can change them easily in the configuration file
+
+The command *rpass* on its own will list account names:
+
+----
+# rpass
+Account Name 1
+Account Name 2
+Account Name 3
+...
+----
+
+NOTE: No password is copied if *rpass* is run without an argument.
+
+The command *rpass* followed by any text will print any accounts that contain
+the text in the account name (search is case-insensitive with regular
+expressions allowed) with all optional fields shown, and copy the password of
+the first matching account to the clipboard:
+
+Simple query:
+
+----
+# rpass 1
+Account Name 1
+...
+----
+
+Regular expressions:
+
+----
+# rpass "name (1|3)$"
+Account Name 1
+Account Name 3
+    optional_field1: optional_value1
+...
+----
+
+SHOWING INFORMATION
+~~~~~~~~~~~~~~~~~~~
+
+NOTE: Any fields can be shown in the default view (the most potentially useful
+being username) by editing the configuration file (~/.rpass.conf).
+
+Username:
+
+----
+# rpass --users [Account searches]
+----
+
+or 
+
+----
+# rpass -u [Account searches]
+----
+
+Password:
+
+----
+# rpass --passwords [Account searches]
+----
+
+or 
+
+----
+# rpass -p [Account searches]
+----
+
+Custom fields:
+
+----
+# rpass --keys 'custom1,custom2' [Account searches]
+----
+
+You can combine these in any way:
+
+----
+# rpass -puk 'custom1' [Account searches]
+----
+
+PIPING
+~~~~~~
+
+rpass attempts intelligent piping support by removing color formatting when it is being piped.
+
+An example is the included utility *rp*. It used dmenu to select an rpass entry. It's code is the following:
+
+----
+# rpass "$(rpass|dmenu -i)"
+----
+
+EDITING
+~~~~~~~
+
+The command *rpass -a* brings up an interface to add accounts and information. You can optionally list the account name(s) on the commandline.
+
+Creates one account (enter name when prompted):
+
+----
+# rpass -a
+----
+
+Creates one account named "Secure Account1" (will be prompted for everything but account name):
+
+----
+# rpass -a "Secure Account1"
+----
+
+Creates three accounts (will be prompted for everything but account names):
+
+----
+# rpass -a "Secure Account2" account3 "Account Name 4"
+----
+
+The command *rpass -d* followed by exact account names deletes those accounts:
+
+----
+# rpass -d "Secure Account2" account3
+----
+
+PLUGIN
+~~~~~~
+
+WARNING: For rpass to be effective as a plugin, you need *gpg-agent*
+
+For any python program or program with support for python plugins, "import
+rpass" will allow you to use all the functions of the main program. The most
+obvious/probably most useful case is one where the program wants to retrieve
+the information about a specific account. Here is how to properly do this for
+account 'Account Name', putting the information into the dictionary infodict:
+
+----
+import rpass
+infodict = rpass.rpass().entries['Account Name']
+
+# Get username
+infodict['user']
+
+# Get password
+infodict['pass']
+----
+
+For non-python programs and scripts the --batch and --keys options allow the
+user to select information to print for any account.
+
+The *--batch* option forces rpass to do exact matching on account names and
+eliminates all formatting and field labels. The *--keys* option allows the user
+to specify custom keys to print.
+
+BATCH EXAMPLES
+~~~~~~~~~~~~~~
+
+Get the unformatted password from account named "AC ONE":
+
+----
+# rpass --batch --password "AC ONE"
+secretpass123
+----
+
+Get the unformatted username and password from account named "AC ONE":
+
+----
+# rpass --batch --users --password "AC ONE"
+username
+secretpass123
+----
+
+or
+
+----
+# rpass --bpu "AC ONE"
+username
+secretpass 123
+----
+
+Get the unformatted username from account named "AC ONE":
+
+----
+# rpass --batch --keys 'user' "AC ONE"
+acusername
+----
+
+Get the unformatted custom field "custom1" and the username from account named "AC ONE":
+
+----
+# rpass --batch --users --keys 'custom1' "AC ONE"
+custom1value
+acusername
+----
+
+or
+
+----
+# rpass -buk 'custom1' "AC ONE"
+custom1value
+acusername
+----
+
+SEE ALSO
+--------
+
+gpg-agent(1), gpg(1)
+
+GOALS
+-----
+* Secure
+    - Passwords are never written out in plaintext to harddrive under ANY
+      conditions
+    - With *xclip* installed, passwords never need to even be seen
+* Simple user interface
+    - Automatic copying
+    - Intuitive, simple searching
+    - Powerful regular expression searching
+* Transparent code
+    - Simple codebase allows bugs to surface quickly, adding to security
+* Pluggable
+    - Importable python module for integration to other python programs
+    - Batch mode for executable
+* Universal password solution
+
+// vim:filetype=asciidoc:

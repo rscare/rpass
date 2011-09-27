@@ -1,0 +1,1 @@
+rpass --batch --passwords "$(rpass --keys ""|dmenu -i -p 'Account name: ')"|xclip -i

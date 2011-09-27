@@ -1,0 +1,684 @@
+'\" t
+.\"     Title: rpass
+.\"    Author: Yuri D. Lenskiy <yuri.lenskiy@gmail.com>
+.\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
+.\"      Date: 12/27/2010
+.\"    Manual: \ \&
+.\"    Source: \ \&
+.\"  Language: English
+.\"
+.TH "RPASS" "1" "12/27/2010" "\ \&" "\ \&"
+.\" -----------------------------------------------------------------
+.\" * Define some portability stuff
+.\" -----------------------------------------------------------------
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.\" http://bugs.debian.org/507673
+.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
+.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+.ie \n(.g .ds Aq \(aq
+.el       .ds Aq '
+.\" -----------------------------------------------------------------
+.\" * set default formatting
+.\" -----------------------------------------------------------------
+.\" disable hyphenation
+.nh
+.\" disable justification (adjust text to left margin only)
+.ad l
+.\" -----------------------------------------------------------------
+.\" * MAIN CONTENT STARTS HERE *
+.\" -----------------------------------------------------------------
+.SH "NAME"
+rpass \- secure (i\&.e\&. encrypted), simple, command\-line password manager
+.SH "SYNOPSIS"
+.sp
+\fBrpass\fR \-a [\fINEW ACCOUNT NAMES\fR \&...]
+.sp
+\fBrpass\fR \-d \fIACCOUNT NAMES\fR
+.sp
+\fBrpass\fR [\fIOPTIONS\fR] \fIPATTERNS\fR \&...
+.sp
+\fBrp\fR
+.sp
+\fBru\fR
+.SH "DESCRIPTION"
+.sp
+\fBrpass\fR is a module and related executable that are meant to make secure password management through the commandline and almost all programs that use passwords accessible, convenient, and easy\&.
+.SH "DEPENDENCIES"
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+The executable
+\fBgpg\fR
+must be in your $PATH\&. This is the ONLY required dependency\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+In order for copying to the X\-clipboard to work,
+\fBxclip\fR
+must be in the user\(cqs $PATH\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+
+\fBgpg\-agent\fR
+for tool to be used to full potential\&.
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+
+\fBdmenu\fR
+for gui tools (\fBrp\fR
+and
+\fBru\fR)
+.RE
+.SH "SETUP"
+.sp
+If installing from source:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# python setup\&.py install
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Run rpass once to set up \fBgpg\fR (generate keys) if this has not been done already\&.
+.SH "USAGE"
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+See rpass \-h for a complete summary of command\-line options\&.
+.sp .5v
+.RE
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBWarning\fR
+.ps -1
+.br
+.sp
+It is highly recommended to have \fBxclip\fR installed so that passwords never have to be written to stdout\&.
+.sp .5v
+.RE
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+Passwords and usernames are never printed unless stated explicitly (see rpass \-h)
+.sp .5v
+.RE
+.SS "CONFIGURATION"
+.sp
+Upon installation a heavily commented configuration file is placed in the home directory at ~/\&.rpass\&.conf\&. If you delete or change this configuration file and want to see the comments/documentation again, there is one located in $PREFIX/share/rpass/rpass\&.example\&.conf\&.
+.sp
+In this configuration file you can set up most of the relevant defaults to \fBrpass\fR\&.
+.SS "VIEWING"
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+These are the defaults, you can change them easily in the configuration file
+.sp .5v
+.RE
+.sp
+The command \fBrpass\fR on its own will list account names:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass
+Account Name 1
+Account Name 2
+Account Name 3
+\&.\&.\&.
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+No password is copied if \fBrpass\fR is run without an argument\&.
+.sp .5v
+.RE
+.sp
+The command \fBrpass\fR followed by any text will print any accounts that contain the text in the account name (search is case\-insensitive with regular expressions allowed) with all optional fields shown, and copy the password of the first matching account to the clipboard:
+.sp
+Simple query:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass 1
+Account Name 1
+\&.\&.\&.
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Regular expressions:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass "name (1|3)$"
+Account Name 1
+Account Name 3
+    optional_field1: optional_value1
+\&.\&.\&.
+.fi
+.if n \{\
+.RE
+.\}
+.SS "SHOWING INFORMATION"
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBNote\fR
+.ps -1
+.br
+.sp
+Any fields can be shown in the default view (the most potentially useful being username) by editing the configuration file (~/\&.rpass\&.conf)\&.
+.sp .5v
+.RE
+.sp
+Username:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass \-\-users [Account searches]
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+or
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass \-u [Account searches]
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Password:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass \-\-passwords [Account searches]
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+or
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass \-p [Account searches]
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Custom fields:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass \-\-keys \*(Aqcustom1,custom2\*(Aq [Account searches]
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+You can combine these in any way:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass \-puk \*(Aqcustom1\*(Aq [Account searches]
+.fi
+.if n \{\
+.RE
+.\}
+.SS "PIPING"
+.sp
+rpass attempts intelligent piping support by removing color formatting when it is being piped\&.
+.sp
+An example is the included utility \fBrp\fR\&. It used dmenu to select an rpass entry\&. It\(cqs code is the following:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass "$(rpass|dmenu \-i)"
+.fi
+.if n \{\
+.RE
+.\}
+.SS "EDITING"
+.sp
+The command \fBrpass \-a\fR brings up an interface to add accounts and information\&. You can optionally list the account name(s) on the commandline\&.
+.sp
+Creates one account (enter name when prompted):
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass \-a
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Creates one account named "Secure Account1" (will be prompted for everything but account name):
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass \-a "Secure Account1"
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Creates three accounts (will be prompted for everything but account names):
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass \-a "Secure Account2" account3 "Account Name 4"
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+The command \fBrpass \-d\fR followed by exact account names deletes those accounts:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass \-d "Secure Account2" account3
+.fi
+.if n \{\
+.RE
+.\}
+.SS "PLUGIN"
+.if n \{\
+.sp
+.\}
+.RS 4
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBWarning\fR
+.ps -1
+.br
+.sp
+For rpass to be effective as a plugin, you need \fBgpg\-agent\fR
+.sp .5v
+.RE
+.sp
+For any python program or program with support for python plugins, "import rpass" will allow you to use all the functions of the main program\&. The most obvious/probably most useful case is one where the program wants to retrieve the information about a specific account\&. Here is how to properly do this for account \fIAccount Name\fR, putting the information into the dictionary infodict:
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+import rpass
+infodict = rpass\&.rpass()\&.entries[\*(AqAccount Name\*(Aq]
+
+# Get username
+infodict[\*(Aquser\*(Aq]
+
+# Get password
+infodict[\*(Aqpass\*(Aq]
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+For non\-python programs and scripts the \-\-batch and \-\-keys options allow the user to select information to print for any account\&.
+.sp
+The \fB\-\-batch\fR option forces rpass to do exact matching on account names and eliminates all formatting and field labels\&. The \fB\-\-keys\fR option allows the user to specify custom keys to print\&.
+.SS "BATCH EXAMPLES"
+.sp
+Get the unformatted password from account named "AC ONE":
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass \-\-batch \-\-password "AC ONE"
+secretpass123
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Get the unformatted username and password from account named "AC ONE":
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass \-\-batch \-\-users \-\-password "AC ONE"
+username
+secretpass123
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+or
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass \-\-bpu "AC ONE"
+username
+secretpass 123
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Get the unformatted username from account named "AC ONE":
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass \-\-batch \-\-keys \*(Aquser\*(Aq "AC ONE"
+acusername
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+Get the unformatted custom field "custom1" and the username from account named "AC ONE":
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass \-\-batch \-\-users \-\-keys \*(Aqcustom1\*(Aq "AC ONE"
+custom1value
+acusername
+.fi
+.if n \{\
+.RE
+.\}
+.sp
+or
+.sp
+.if n \{\
+.RS 4
+.\}
+.nf
+# rpass \-buk \*(Aqcustom1\*(Aq "AC ONE"
+custom1value
+acusername
+.fi
+.if n \{\
+.RE
+.\}
+.SH "SEE ALSO"
+.sp
+gpg\-agent(1), gpg(1)
+.SH "GOALS"
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Secure
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Passwords are never written out in plaintext to harddrive under ANY conditions
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+With
+\fBxclip\fR
+installed, passwords never need to even be seen
+.RE
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Simple user interface
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Automatic copying
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Intuitive, simple searching
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Powerful regular expression searching
+.RE
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Transparent code
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Simple codebase allows bugs to surface quickly, adding to security
+.RE
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Pluggable
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Importable python module for integration to other python programs
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Batch mode for executable
+.RE
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+Universal password solution
+.RE
+.SH "AUTHOR"
+.PP
+\fBYuri D\&. Lenskiy\fR <\&yuri\&.lenskiy@gmail\&.com\&>
+.RS 4
+Author.
+.RE
