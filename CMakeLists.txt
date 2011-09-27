@@ -1,8 +1,6 @@
 cmake_minimum_required (VERSION 2.8.5)
 project (rpassd)
 
-include("${CMAKE_SOURCE_DIR}/../cmake/rpass.cmake")
-
 add_executable(rpassd rpassd.cpp rpassd_password.cpp rpassd_signal_handlers.cpp)
 
 find_package(Librpass)
